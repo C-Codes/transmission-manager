@@ -2,13 +2,13 @@ import os
 from setuptools import setup
 
 setup(
-    name='transmission-manager'
-    description='Dynamically managing activity of Transmission BT Client in response to user events.'
-    long_description=(docs_read('README.md'))
-    url='https://github.com/C-Codes/transmission-manager'
-    author='Christoph Russ'
-    author_email='chruss@gmx.de'
-    platforms=['any']
+    name='transmission-manager',
+    description='Dynamically managing activity of Transmission BT Client in response to user events.',
+    long_description=(docs_read('README.md')),
+    url='https://github.com/C-Codes/transmission-manager',
+    author='Christoph Russ',
+    author_email='chruss@gmx.de',
+    platforms=['any'],
     classifiers=[
         'Intended Audience :: End Users/Desktop',
         'Topic :: Communications :: File Sharing',
