@@ -1,10 +1,13 @@
 import os
 from setuptools import setup
 
+def read_file(file_name):
+    return open(os.path.join(os.path.dirname(__file__), 'docs', file_name)).read()
+
 setup(
     name='transmission-manager',
     description='Dynamically managing activity of Transmission BT Client in response to user events.',
-    long_description=(docs_read('README.md')),
+    long_description=(read_file('README.md')),
     url='https://github.com/C-Codes/transmission-manager',
     author='Christoph Russ',
     author_email='chruss@gmx.de',

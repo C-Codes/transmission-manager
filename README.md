@@ -17,12 +17,14 @@ The motivation to develop and use this application is related to a desire to imp
 Make sure Transmission is running on your machine (or at least know where it is running - see **Remote Access** for more info).
 
 Setup and start transmission-manager by calling:
-    git clone https://github.com/C-Codes/transmission-manager.git
-    cd transmission-manager
-    python transmission/manager.py
+
+`    git clone https://github.com/C-Codes/transmission-manager.git`
+`    cd transmission-manager`
+`    python transmission/manager.py`
 
 Alternative pip install command:
-    pip install --user git+https://github.com/C-Codes/transmission-manager.git
+
+`    pip install --user git+https://github.com/C-Codes/transmission-manager.git`
 
 ## Remote Access
 
