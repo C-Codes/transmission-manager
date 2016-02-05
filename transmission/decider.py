@@ -10,6 +10,8 @@ def is_network_busy(event_threshold=4):
 
     recent_device_ids = []
     recent_device_dts = []
+    invisible_device_ids = []
+    invisible_device_dts = []
 
     most_recent_id = -1
     most_recent_dt = -1
@@ -31,6 +33,11 @@ def is_network_busy(event_threshold=4):
                 most_recent_id = id
                 most_recent_dt = dt_since_last_visit
 
+        else:
+            # these are devices that have long been gone from our view
+            invisible_device_ids.append(id)
+            invisible_device_dts.append(dt_since_last_visit)
+
     if len(recent_device_ids) == 0:
         print("Found ZERO active devices on the network - this seems suspicious.")
         # assuming there is at least one constant device always available (e.g. the router)
@@ -50,13 +57,31 @@ def is_network_busy(event_threshold=4):
         # let's look at the relative availability
         #has someone recently become inactive?
         if (dt - most_recent_dt) > event_dtime:
-            print(d._name+" has been inactive for a while now ...")
+            print(d._name+" has just become inactive ...")
             # MAYBE IT IS OK TO USE THE NETWORK NOW ?
             now_inactive_device_ids.append(id)
             now_inactive_device_dts.append(dt)
+            d.set_priority(0)
         else:
-            # check if these have only recently become active ...
+            print(d._name+" is active right now ...")
+            # TODO: check if these have only recently become active ...?
             now_active_device_ids.append(id)
             now_active_device_dts.append(dt)
+            d.set_priority(-1)
 
-    # now let's look into the history of availability a little more
+    # TODO: let's look into the history of availability a little more
+    # NOTE: but maybe keep it simple and not overly complicate things ?
+
+    for id,dt in zip(invisible_device_ids,invisible_device_dts):
+        d = device_db[id]
+
+        if (dt-most_recent_dt) > activity_dtime * 4:
+            print(d._name+" has been invisible for a long time")
+            # very high priority device (make network resources available in case of return)
+            d.set_priority(1)
+        else:
+            print(d._name+" has been invisible for a while")
+            d.set_priority(0)
+
+
+    return True

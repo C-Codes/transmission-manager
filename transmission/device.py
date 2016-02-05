@@ -5,6 +5,7 @@ class Device:
     _ips = set()
     _tss = []
     _max_tss = 42
+    _priority = 0
 
     def __init__(self, name='', mac=''):
         self._name = name
@@ -12,12 +13,16 @@ class Device:
         self._ips = set()
         self._tss = []
         self._max_tss = 42
+        self._priority = 0
 
     def set_name(self, name):
         self._name = name
 
     def set_mac(self, mac):
         self._mac = mac
+
+    def set_priority(self, p):
+        self._priority = p
 
     def add_ip(self, ip):
         self._ips.add(str(ip))
@@ -38,7 +43,7 @@ class Device:
         return len(self._tss)
 
     def to_string(self):
-        main_string = self._name + ";" + self._mac + ";"
+        main_string = self._name + ";" + self._mac + ";" + str(self._priority) + ";"
         ip_string = ",".join(self._ips)
         ts_string = ",".join(self._tss)
         main_string += ip_string + ";" + ts_string
@@ -46,18 +51,23 @@ class Device:
 
     def from_string(self, s):
         main_components = s.rstrip('\n').split(';')
-        if len(main_components) != 4:
+        if len(main_components) != 5:
             print("Could not load device info",s)
             return
 
-        self.set_name(main_components[0])
-        self.set_mac(main_components[1])
+        index = 0
 
-        ips = main_components[2].split(',')
+        self.set_name(main_components[index])
+        index += 1
+        self.set_mac(main_components[index])
+        index += 1
+        self.set_priority(int(main_components[index]))
+        index += 1
+        ips = main_components[index].split(',')
         for ip in ips:
             self.add_ip(ip)
-
-        tss = main_components[3].split(',')
+        index += 1
+        tss = main_components[index].split(',')
         for ts in tss:
             self.add_ts(ts)
 
