@@ -6,6 +6,9 @@ from __future__ import division
 
 import socket
 
+def host_name():
+    return socket.gethostname()
+
 def find_local_ip():
     # find our local area network address (may not work on some linux distros)
     local_ip = socket.gethostbyname(socket.gethostname())
@@ -24,17 +27,19 @@ def find_local_ip():
 
     return local_ip
 
-def check_local_peer_thread(ip, result, index):
+def check_peer_thread(ip, result, index):
+    #FIXME: (it is platform specific :/)
     #TODO: might want to switch to subprocess.call
     import os
     result[index] = os.system("ping -q -o -c 1 -W 420 "+ip+" > /dev/null")
 
-def check_local_peer(ip):
+def check_peer(ip):
+    #FIXME: (it is platform specific :/)
     #TODO: might want to switch to subprocess.call
     import os
     return os.system("ping -q -o -c 1 -W 420 "+ip+" > /dev/null")
 
-def find_local_peers(ip, sub_ip_max=44):
+def find_peers(ip, sub_ip_max=44):
     local_peers = []
 
     if ip.count('.') != 3:
@@ -59,7 +64,7 @@ def find_local_peers(ip, sub_ip_max=44):
     ## zero parallelism Version
     '''
     for sip in sub_ip_range:
-        ret = check_local_peer(test_ip)
+        ret = check_peer(test_ip)
         if ret == 0:
             local_peers.append(main_ip+'.'+str(sip))
     '''
@@ -72,7 +77,7 @@ def find_local_peers(ip, sub_ip_max=44):
 
     for i,sip in enumerate(sub_ip_range):
         test_ip = main_ip+'.'+str(sip)
-        t = threading.Thread(target=check_local_peer_thread, args=(test_ip,check_lp_results,i))
+        t = threading.Thread(target=check_peer_thread, args=(test_ip,check_lp_results,i))
         t.start()
         check_lp_threads.append(t)
 
@@ -87,7 +92,7 @@ def find_local_peers(ip, sub_ip_max=44):
     import multiprocessing
     pool = multiprocessing.Pool(sub_ip_max) #technically you may want a lower pool size, but ping uses so little resources that all of these can be processed at the same time
 
-    check_lp_results = pool.map(check_local_peer, [main_ip+'.'+str(sip) for sip in sub_ip_range])
+    check_lp_results = pool.map(check_peer, [main_ip+'.'+str(sip) for sip in sub_ip_range])
 
     for i,r in enumerate(check_lp_results):
         if r == 0:
@@ -96,6 +101,22 @@ def find_local_peers(ip, sub_ip_max=44):
     #print(local_peers)
 
     return local_peers
+
+def find_mac(ip):
+    #FIXME: (it is platform specific :/)
+    '''
+    Make sure you have recently called PING or had some other connection established to this ip!
+    Otherwise this solution won't work
+    '''
+    #insipired by: http://stackoverflow.com/questions/1750803/obtain-mac-address-from-devices-using-python
+    import subprocess, re
+    result = subprocess.check_output(["arp","-n",ip])
+    mac = re.search(r"(([a-f\d]{1,2}\:){5}[a-f\d]{1,2})", result).groups()[0]
+
+    return mac
+
+def find_macs(ips):
+    return [find_mac(ip) for ip in ips]
 
 def open_port(ip, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -114,16 +135,16 @@ def find_transmission(port=9091):
 
     if open_port('127.0.0.1',port):
        print("Port",str(port),"is open on localhost")
-       return '127.0.0.1:'+str(port)
+       return '127.0.0.1:'+str(port),[]
 
     local_ip = find_local_ip()
 
-    local_peers = find_local_peers(local_ip)
+    local_peers = find_peers(local_ip)
 
     for local_peer in local_peers:
         if open_port(local_peer,port):
             print("Port",str(port),"is open on",local_peer)
-            return local_peer+str(port)
+            return local_peer+str(port),local_peers
         else:
             print("Port",str(port),"is closed on",local_peer)
 
@@ -132,4 +153,4 @@ def find_transmission(port=9091):
 
     # couldn't find any active, valid connection to transmission
 
-    return '0.0.0.0:'+str(port)
+    return '0.0.0.0:'+str(port),local_peers

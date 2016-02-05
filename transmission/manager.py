@@ -5,11 +5,20 @@ from __future__ import print_function
 from __future__ import division
 
 def main():
-    print("Starting Transmission Manager.")
+    print("Running Transmission Manager.")
 
     import communication
-    t_ip_port = communication.find_transmission()
+    t_ip_port,local_peers = communication.find_transmission()
 
+    if len(local_peers) < 1:
+        local_ip = communication.find_local_ip()
+        local_peers = communication.find_peers(local_ip)
+
+    # record what we have found
+    # over time it will become interesting to see which IPs are frequently offline or online
+    # TODO: this does not log the local host (ip,mac,..) right now !
+    import knowledge
+    knowledge.record_peers(local_peers)
 
 
 if __name__ == '__main__':

@@ -4,7 +4,11 @@ A management application for the BitTorrent Client [Transmission](http://www.tra
 
 ## What do I need?
 
-Developed to run under Python 2.7 (with Python 3.4 in mind). Requires the `transmission-remote` to be installed and present in your `$PATH`. It is distributed as part of the transmission project and can usually be installed through your package manager. (Note: installing `transmission` as part of homebrew under Mac OS X will install `transmission-remote`).
+1. Developed to run under Python 2.7 (with Python 3.4 in mind).
+2. Requires the `transmission-remote` to be installed and present in your `$PATH`, which is distributed as part of the transmission project and can usually be installed through your package manager. (Note: installing `transmission` as part of homebrew under Mac OS X will install `transmission-remote`).
+3. PyPi package `appdirs` to access configuration and cache directories for app settings (install with: `pip install --user appdirs`).
+
+Currently **DOES NOT** support Windows, but should run under Linux and Mac OS X.
 
 ## Do I need this?
 
@@ -19,7 +23,9 @@ Make sure Transmission is running on your machine (or at least know where it is 
 Setup and start transmission-manager by calling:
 
 `    git clone https://github.com/C-Codes/transmission-manager.git`
+
 `    cd transmission-manager`
+
 `    python transmission/manager.py`
 
 Alternative pip install command:
