@@ -68,7 +68,7 @@ class Device:
         import datetime
         cur_time = datetime.datetime.now()
         last_log = self.last_seen()
-        last_log_time = datetime.datetime.strptime(last_log)
+        last_log_time = datetime.datetime.strptime(last_log,"%Y-%m-%d %H:%M:%S.%f") #2016-02-05 11:22:35.848370
 
         diff_time = cur_time - last_log_time
         return diff_time
