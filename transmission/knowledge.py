@@ -6,12 +6,8 @@ from builtins import input
 
 import datetime
 
-DEVICE_LIST = []
-
 def load_db():
-    global DEVICE_LIST
-
-    DEVICE_LIST = []
+    device_list = []
 
     import appdirs, os
     app_dir = appdirs.user_data_dir('transmission-manager')
@@ -24,13 +20,11 @@ def load_db():
         for db_line in db_lines:
             d = Device()
             d.from_string(db_line)
-            DEVICE_LIST.append(d)
+            device_list.append(d)
 
-    #return DEVICE_LIST
+    return device_list
 
-def save_db():
-    global DEVICE_LIST
-
+def save_db(device_list):
     import appdirs, os
     app_dir = appdirs.user_data_dir('transmission-manager')
     db_file = os.path.join(app_dir,"device_list")
@@ -39,23 +33,22 @@ def save_db():
         os.makedirs(app_dir)
 
     with open(db_file, 'w') as df:
-        for d in DEVICE_LIST:
+        for d in device_list:
             df.write(d.to_string()+'\n')
 
 def active_device(mac, ip='0.0.0.0', name='', time_stamp = datetime.datetime.now()):
-    global DEVICE_LIST
-
-    load_db()
+    device_list = load_db()
 
     #time_stamp = datetime.datetime.now()
 
     mac_list = []
-    for d in DEVICE_LIST:
+    for d in device_list:
         mac_list.append(d._mac)
 
     if not mac in mac_list:
         #have not found this device previously
         if len(name) < 1:
+            #FIXME: should be more automated - no input should really be required
             name = input('What is the name of this machine? ('+ip+', '+mac+') ')
 
         from device import Device
@@ -65,18 +58,18 @@ def active_device(mac, ip='0.0.0.0', name='', time_stamp = datetime.datetime.now
         unkn_d.add_ip(ip)
         unkn_d.add_ts(time_stamp)
 
-        print("Adding new DEVICE to DB")
-        DEVICE_LIST.append(unkn_d)
+        #print("Adding new DEVICE to DB")
+        device_list.append(unkn_d)
 
     else:
         # already part of the db - only add time stamp
-        print("Updating existing DEVICE in DB")
+        #print("Updating existing DEVICE in DB")
 
         index = mac_list.index(mac)
-        DEVICE_LIST[index].add_ip(ip)
-        DEVICE_LIST[index].add_ts(time_stamp)
+        device_list[index].add_ip(ip)
+        device_list[index].add_ts(time_stamp)
 
-    save_db()
+    save_db(device_list)
 
 def record_peers(ip_peers):
     import communication
@@ -88,8 +81,7 @@ def record_peers(ip_peers):
         active_device(mac_peer,ip_peer)
 
 def main():
-    global DEVICE_LIST
-    print("Initializing network knowledge to make life easier.")
+    #print("Initializing network knowledge to make life easier.")
 
     import communication
     local_ip = communication.find_local_ip()
