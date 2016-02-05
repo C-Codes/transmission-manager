@@ -16,7 +16,10 @@ def main():
 
     # record what we have found - this part should actually be executed every 10 min or something like that
     # over time it will become interesting to see which IPs are frequently offline or online
-    # TODO: this does not log the local host (ip,mac,..) right now !
+
+    # also record the local ip !
+    local_peers.append(local_ip)
+
     import knowledge
     knowledge.record_peers(local_peers)
 
